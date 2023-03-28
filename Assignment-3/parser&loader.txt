@@ -1,0 +1,121 @@
+import csv 
+import pandas as pd
+
+f = open("source.txt",encoding="utf-8")
+f1 = open("List_of_Authors.csv",'w',encoding = "utf-8",newline='')
+f2 = open("Research_paper.csv",'w',encoding = "utf-8",newline='')
+f3 = open("Citation.csv",'w',encoding = "utf-8",newline='')
+f4 = open("Author.csv",'w',encoding = "utf-8",newline='')
+statements = f.readlines()
+authors_list ={''}
+paper_title =''
+references = []
+year = 0 
+abstract = ""
+venue = ""
+paper_id =-1
+
+for st in statements:
+    
+    
+    if st[0:2] =="#*"  :
+        #print(paper_title)
+        if paper_title == '' :
+            paper_title = st[2:]
+            print(paper_title)
+
+        else:
+            print(paper_id)
+            paper_title_2 = st[2:]
+            research_paper_filler=[paper_title,year,abstract,paper_id,venue]
+            writer = csv.writer(f2)
+            writer.writerow(research_paper_filler)
+            for i in range(len(authors)):
+                if( authors[i] !=''):
+                   fillerauth=[paper_id,authors[i]]
+                   writer = csv.writer(f1)
+                   writer.writerow(fillerauth)
+            for i in range(len(references)):
+                citations_filler = [paper_id,references[i]]
+                writer = csv.writer(f3)
+                writer.writerow(citations_filler)
+            paper_title = paper_title_2
+            references = []
+
+
+        
+    if st[0:2] == "#@":
+        authors = []
+        authors = st[2:].split(',')
+        for i in authors:
+            authors_list.add(i)
+    if st[0:2]== "#t":
+        year = int(st[2:])
+    if st[0:2] == "#c":
+        venue = st[2:]
+    if st[0:2] == "#i":
+        paper_id = int(st[6:])
+    if st[0:2] == "#!":
+        abstract = st[2:]
+    if st[0:2] == "#%":
+        references.append(int(st[2:]))
+writer = csv.writer(f4)
+authors_list = list(authors_list)
+writer.writerow(authors_list)
+
+
+
+
+CREATE TABLE Research_paper
+(
+  paper_title VARCHAR(100000) NOT NULL,
+  Year_of_publication INT NOT NULL,
+  Abstract VARCHAR(100000) ,
+  id INT NOT NULL,
+  venue VARCHAR(10000),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE Author
+(
+  Name_ VARCHAR(10000) ,
+  PRIMARY KEY (Name_)
+);
+
+CREATE TABLE List_of_Authors
+(
+  id INT NOT NULL,
+  Name_ VARCHAR(10000) ,
+  PRIMARY KEY (id, Name_),
+  FOREIGN KEY (id) REFERENCES Research_paper(id),
+  FOREIGN KEY (Name_) REFERENCES Author(Name_)
+);
+
+CREATE TABLE Citation
+(
+  id_1 INT NOT NULL,
+  Citationid_2 INT ,
+  PRIMARY KEY (id_1, Citationid_2),
+  FOREIGN KEY (id_1) REFERENCES Research_paper(id),
+  FOREIGN KEY (Citationid_2) REFERENCES Research_paper(id)
+);
+
+COPY citation(id_1,citationid_2)
+FROM 'C:\Users\Lenovo\Desktop\dbms-2\fff\citation.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY resarch_paper(title,year,abstract,id,venue)
+FROM 'C:\Users\Lenovo\Desktop\dbms-2\fff\list_of_authors.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY list_of_authors(id,name_)
+FROM 'C:\Users\Lenovo\Desktop\dbms-2\fff\list_of_authors.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY list_of_authors(id,name_)
+FROM 'C:\Users\Lenovo\Desktop\dbms-2\fff\list_of_authors.csv'
+DELIMITER ','
+CSV HEADER;
